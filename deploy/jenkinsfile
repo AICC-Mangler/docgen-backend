@@ -118,6 +118,80 @@ pipeline {
                 }
             }
         }
+        stage('🚀 Deploy') {
+            when {
+                environment name: 'DOCKER_PUSH_SUCCESS', value: 'true'
+            }
+            steps {
+                script {
+                    def currentBranch = env.CURRENT_BRANCH ?: env.BRANCH_NAME ?: 'main'
+                    def deployEnv = currentBranch.contains('main') ? 'production' : 'development'
+                    def containerName = "${CONTAINER_NAME}-${deployEnv}"
+                    def containerPort = deployEnv == 'production' ? '3000' : '3001'
+                    def dockerNetwork = 'demo-net'
+
+                    echo "🚀 배포 시작: ${deployEnv} 환경"
+                    echo "📦 컨테이너: ${containerName}"
+                    echo "🔌 포트: ${containerPort}"
+                    echo "📦 이미지: ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}"
+
+                    try {
+                        // Docker Registry 인증 후 이미지 pull
+                        docker.withRegistry("https://${DOCKER_REGISTRY}", "${DOCKER_CREDENTIALS}") {
+                            sh "docker pull ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}"
+                        }
+
+                        sh """
+                            # 기존 컨테이너 중지 및 삭제
+                            docker stop ${containerName} || true
+                            docker rm ${containerName} || true
+
+                            # 새 컨테이너 실행
+                            docker run -d \\
+                                --name ${containerName} \\
+                                --network ${dockerNetwork} \\
+                                --restart unless-stopped \\
+                                --label "app=nestjs-backend" \\
+                                --label "env=${deployEnv}" \\
+                                --label "version=${BUILD_NUMBER}" \\
+                                --label "branch=${currentBranch}" \\
+                                --label "commit=${env.GIT_COMMIT_SHORT}" \\
+                                -p ${containerPort}:3000 \\
+                                ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}
+
+                            # 컨테이너 상태 확인
+                            sleep 5
+                            docker ps | grep ${containerName}
+                            echo "✅ 컨테이너 ${containerName} 배포 완료"
+                        """
+
+                        env.DEPLOY_SUCCESS = 'true'
+
+                    } catch (Exception e) {
+                        env.DEPLOY_SUCCESS = 'false'
+                        echo "❌ 배포 실패: ${e.getMessage()}"
+                        error "배포 실패: ${e.getMessage()}"
+                    }
+
+                    // 배포 후 헬스 체크
+                    if (env.DEPLOY_SUCCESS == 'true') {
+                        sh """
+                            echo "🔍 헬스 체크 시작"
+                            sleep 5
+                            for i in \$(seq 1 10); do
+                                if curl -f http://localhost:${containerPort} > /dev/null 2>&1; then
+                                    echo "✅ 애플리케이션이 정상적으로 실행 중입니다"
+                                    break
+                                else
+                                    echo "⏳ 대기 중... (\$i/10)"
+                                    sleep 3
+                                fi
+                            done
+                        """
+                    }
+                }
+            }
+        }
     }
 
     
