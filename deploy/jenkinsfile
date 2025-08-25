@@ -86,6 +86,38 @@ pipeline {
                 }
             }
         }
+
+        stage('📤 Push Docker Image') {
+            when {
+                environment name: 'DOCKER_BUILD_SUCCESS', value: 'true'
+            }
+            steps {
+                script {
+                    try {
+                        docker.withRegistry("https://${DOCKER_REGISTRY}", "${DOCKER_CREDENTIALS}") {
+                            def app = docker.image("${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}")
+                            app.push("${BUILD_NUMBER}")
+
+                            // main 브랜치는 latest 태그도 푸시
+                            def currentBranch = env.GIT_BRANCH ?: 'develop'
+                            if (currentBranch.contains('main')) {
+                                app.push("latest")
+                                echo "✅ latest 태그 푸시 완료"
+                            }
+                        }
+
+                        env.DOCKER_PUSH_SUCCESS = 'true'
+                        echo "✅ Docker 이미지 푸시 성공: ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}"
+                    } catch (Exception e) {
+                        env.DOCKER_PUSH_SUCCESS = 'false'
+                        echo "❌ Docker Registry 인증 또는 푸시 실패: ${e.getMessage()}"
+                        echo "🔍 Docker Registry: ${DOCKER_REGISTRY}"
+                        echo "🔍 Credentials ID: ${DOCKER_CREDENTIALS}"
+                        error "Docker 푸시 실패: ${e.getMessage()}"
+                    }
+                }
+            }
+        }
     }
 
     
