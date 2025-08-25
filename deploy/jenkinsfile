@@ -5,6 +5,10 @@ pipeline {
         NODE_ENV = "production"
     }
 
+    tools {
+        nodejs 'node-v20.19.4'
+    }
+
     stages {
         stage('📥 Checkout') {
             steps {
