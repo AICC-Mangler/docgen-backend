@@ -1,22 +1,26 @@
 pipeline {
     agent any
     stages {
-        stage('Build') {
+        stage('Prepare'){
             steps {
-                echo 'Building..'
-								# do something for Build
+                git credentialsId : '{credentialId}',
+                    branch : '{branchName}',
+                    url : 'https://github.com/{repoName}/{projectName}.git'
             }
         }
-        stage('Test') {
+        stage('test') {
             steps {
-                echo 'Testing..'
-								# do something for Test
+                echo 'test stage'
             }
         }
-        stage('Deploy') {
+        stage('build') {
             steps {
-                echo 'Deploying....'
-								# do something for Deployment
+                echo 'build stage'
+            }
+        }
+        stage('docker build') {
+            steps {
+                echo 'docker build stage'
             }
         }
     }
