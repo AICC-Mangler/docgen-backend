@@ -3,6 +3,14 @@ pipeline {
 
     environment {
         NODE_ENV = "production"
+        DEPLOY_SERVER = "user@your-server-ip"
+
+        // Docker Registry 설정
+        DOCKER_REGISTRY = "${env.CUSTOM_DOCKER_REGISTRY}"
+        DOCKER_CREDENTIALS = "${env.CUSTOM_DOCKER_CREDENTIALS}"
+        DOCKER_IMAGE = 'mangler/docgen-backend'
+        CONTAINER_NAME = 'mangler-docgen-backend'
+        DOCKERFILE_PATH = "deploy/Dockerfile"   // Dockerfile 경로
     }
 
     tools {
@@ -55,7 +63,32 @@ pipeline {
                 '''
             }
         }
+
+        stage('🐳 Docker Build') {
+            steps {
+                script {
+                    try {
+                        echo "🐳 Docker 이미지 빌드 시작"
+
+                        def app = docker.build("${DOCKER_IMAGE}:${BUILD_NUMBER}", "-f ${DOCKERFILE_PATH} .")
+
+                        // 빌드 성공 시 환경 변수 설정
+                        env.DOCKER_BUILD_SUCCESS = 'true'
+                        env.DOCKER_IMAGE_TAG = "${DOCKER_IMAGE}:${BUILD_NUMBER}"
+
+                        echo "✅ Docker 이미지 빌드 성공"
+                        echo "📦 이미지 태그: ${env.DOCKER_IMAGE_TAG}"
+
+                    } catch (Exception e) {
+                        env.DOCKER_BUILD_SUCCESS = 'false'
+                        error "❌ Docker 빌드 실패: ${e.getMessage()}"
+                    }
+                }
+            }
+        }
     }
+
+    
 
     post {
         success {

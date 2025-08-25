@@ -1,0 +1,35 @@
+# 1️⃣ Build Stage
+FROM node:20.19-alpine AS builder
+
+# 작업 디렉토리 생성
+WORKDIR /app
+
+# package.json + package-lock.json 복사
+COPY package*.json ./
+
+# 의존성 설치 (devDependencies 포함, 빌드 필요)
+RUN npm ci --include=dev --no-audit --no-fund --prefer-offline
+
+# 소스 코드 복사
+COPY . .
+
+# NestJS 빌드
+RUN npm run build
+
+# 2️⃣ Production Stage
+FROM node:18-alpine
+
+WORKDIR /app
+
+# production 의존성만 설치
+COPY package*.json ./
+RUN npm ci --omit=dev --no-audit --no-fund --prefer-offline
+
+# 빌드 산출물 복사
+COPY --from=builder /app/dist ./dist
+
+# 포트 설정
+EXPOSE 3000
+
+# 앱 실행
+CMD ["node", "dist/main.js"]
