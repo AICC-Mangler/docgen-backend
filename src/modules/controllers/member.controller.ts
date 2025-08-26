@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Put, Delete, Param, Body, HttpException, HttpStatus } from '@nestjs/common';
-import { MemberService } from '../services/memberService';
+import { MemberService } from '../services/member.service';
 import { 
   CreateMemberDto, 
   UpdateMemberDto, 
