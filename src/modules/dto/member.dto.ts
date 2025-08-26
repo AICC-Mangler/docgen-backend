@@ -1,10 +1,18 @@
-import { IsString, IsEmail, IsOptional, IsEnum, MinLength, MaxLength, IsNumber, IsDate } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  IsOptional,
+  IsEnum,
+  MinLength,
+  MaxLength,
+  IsNumber,
+  IsDate,
+} from 'class-validator';
 
 // Member 역할 enum
 export enum MemberRole {
   USER = 'USER',
   ADMIN = 'ADMIN',
-  MODERATOR = 'MODERATOR'
 }
 
 // Member 생성 DTO

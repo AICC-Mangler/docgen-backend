@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateMemberDto, UpdateMemberDto, MemberResponseDto } from '../dto/member.dto';
+import {
+  CreateMemberDto,
+  UpdateMemberDto,
+  MemberResponseDto,
+} from '../dto/member.dto';
 import { Member } from '../entities/member.entity';
 
 @Injectable()
@@ -10,7 +14,7 @@ export class MemberService {
     @InjectRepository(Member)
     private memberRepository: Repository<Member>,
   ) {}
-  
+
   async findAll(): Promise<Member[]> {
     try {
       const members = await this.memberRepository.find({
@@ -42,11 +46,11 @@ export class MemberService {
     try {
       const member = this.memberRepository.create(createMemberDto);
       const savedMember = await this.memberRepository.save(member);
-      console.log('새 멤버가 생성되었습니다:', { 
-        id: savedMember.id, 
-        name: savedMember.name, 
-        email: savedMember.email, 
-        role: savedMember.role 
+      console.log('새 멤버가 생성되었습니다:', {
+        id: savedMember.id,
+        name: savedMember.name,
+        email: savedMember.email,
+        role: savedMember.role,
       });
       return savedMember;
     } catch (error) {
@@ -60,11 +64,11 @@ export class MemberService {
       const member = await this.findById(id);
       Object.assign(member, updateMemberDto);
       const updatedMember = await this.memberRepository.save(member);
-      console.log('멤버가 수정되었습니다:', { 
-        id: updatedMember.id, 
-        name: updatedMember.name, 
-        email: updatedMember.email, 
-        role: updatedMember.role 
+      console.log('멤버가 수정되었습니다:', {
+        id: updatedMember.id,
+        name: updatedMember.name,
+        email: updatedMember.email,
+        role: updatedMember.role,
       });
       return updatedMember;
     } catch (error) {
@@ -99,7 +103,7 @@ export class MemberService {
   // 응답용 멤버 목록 조회
   async findAllForResponse(): Promise<MemberResponseDto[]> {
     const members = await this.findAll();
-    return members.map(member => this.toResponseDto(member));
+    return members.map((member) => this.toResponseDto(member));
   }
 
   // 응답용 단일 멤버 조회

@@ -6,10 +6,7 @@ import { MemberModule } from './modules/module';
 import { typeOrmConfig } from './config/typeorm.config';
 
 @Module({
-  imports: [
-    TypeOrmModule.forRoot(typeOrmConfig),
-    MemberModule,
-  ],
+  imports: [TypeOrmModule.forRoot(typeOrmConfig), MemberModule],
   controllers: [AppController],
   providers: [AppService],
 })
