@@ -11,6 +11,8 @@ pipeline {
         DOCKER_IMAGE = 'mangler/docgen-backend'
         CONTAINER_NAME = 'mangler-docgen-backend'
         DOCKERFILE_PATH = "deploy/Dockerfile"   // Dockerfile 경로
+
+        ENV_FILE_CREDENTIALS_ID = "MANGLER_DOCGEN_BACK_ENV_FILE"
     }
 
     tools {
@@ -42,6 +44,23 @@ pipeline {
                     echo "📋 TypeScript 확인:"
                     ls -la node_modules/.bin/tsc || echo "TypeScript 바이너리 확인 실패"
                 '''
+            }
+        }
+
+        stage('.env file 생성'){
+            steps{
+                script{
+                    withCredentials([
+                            file(credentialsId: ENV_FILE_CREDENTIALS_ID, variable: 'ENV_FILE')
+                        ]) {
+                            sh """
+                                echo "📄 환경 변수 파일 복사 중"
+                                cp "\$ENV_FILE" .env
+                                chmod 644 .env
+                                echo "✅ 환경 변수 파일 생성 완료"
+                            """
+                        }
+                    }
             }
         }
 

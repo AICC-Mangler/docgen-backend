@@ -1,6 +1,6 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { databaseConfig } from './database.config';
-import { Member } from '../entities/member.entity';
+import { Member } from '../modules/entities/member.entity';
 
 export const typeOrmConfig: TypeOrmModuleOptions = {
   type: 'postgres',
