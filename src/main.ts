@@ -11,7 +11,6 @@ async function bootstrap() {
     forbidNonWhitelisted: true, // DTO에 정의되지 않은 속성이 있으면 에러
     transform: true, // 자동 타입 변환
   }));
-  
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.APP_PORT ?? 3100);
 }
 bootstrap();
