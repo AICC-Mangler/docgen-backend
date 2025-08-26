@@ -52,3 +52,36 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
+
+## 구조 설명 (예시 : member)
+
+1. API
+/member (Base Path)
+├── GET /           → 전체 멤버 조회
+├── GET /:id        → 특정 멤버 조회
+├── POST /          → 새 멤버 생성
+├── PUT /:id        → 멤버 수정
+└── DELETE /:id     → 멤버 삭제 (Soft Delete)  << 어떻게 삭제시킬지에 따라 다르게 적용할 수 있음
+
+2. 요청 - 응답 흐릅 (request & response cycle)
+```
+1. Client Request
+   ↓
+2. NestJS Router
+   ↓
+3. Controller (요청 검증)
+   ↓
+4. Service (비즈니스 로직)
+   ↓
+5. Repository (데이터베이스 쿼리)
+   ↓
+6. PostgreSQL Database
+   ↓
+7. Repository (결과 반환)
+   ↓
+8. Service (데이터 처리)
+   ↓
+9. Controller (응답 포맷팅)
+   ↓
+10. Client Response
+```
