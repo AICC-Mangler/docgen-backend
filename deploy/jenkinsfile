@@ -146,7 +146,7 @@ pipeline {
                     def currentBranch = env.CURRENT_BRANCH ?: env.BRANCH_NAME ?: 'main'
                     def deployEnv = currentBranch.contains('main') ? 'production' : 'development'
                     def containerName = "${CONTAINER_NAME}-${deployEnv}"
-                    def containerPort = deployEnv == 'production' ? '3000' : '3001'
+                    def containerPort = deployEnv == 'production' ? '3100' : '3101'
                     def dockerNetwork = 'demo-net'
 
                     echo "🚀 배포 시작: ${deployEnv} 환경"
@@ -175,6 +175,7 @@ pipeline {
                                 --label "version=${BUILD_NUMBER}" \\
                                 --label "branch=${currentBranch}" \\
                                 --label "commit=${env.GIT_COMMIT_SHORT}" \\
+                                --env-file .env \\
                                 -p ${containerPort}:3000 \\
                                 ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}
 
