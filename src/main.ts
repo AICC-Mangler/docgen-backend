@@ -6,8 +6,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // CORS 설정 추가
-  const corsOrigins = process.env.CORS_ORIGINS 
-    ? process.env.CORS_ORIGINS.split(',').map(origin => origin.trim())
+  const corsOrigins = process.env.CORS_ORIGINS
+    ? process.env.CORS_ORIGINS.split(',').map((origin) => origin.trim())
     : [
         'http://localhost:5173', // 로컬 프론트엔드
         'http://localhost:3100', // 로컬 프론트엔드 (다른 포트)
@@ -37,7 +37,7 @@ async function bootstrap() {
       transform: true, // 자동 타입 변환
     }),
   );
-  
+
   await app.listen(process.env.APP_PORT ?? 3100);
 }
 bootstrap();
