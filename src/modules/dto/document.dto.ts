@@ -9,12 +9,19 @@ import {
   IsNumber,
   IsDate,
   ValidateNested,
+  IsBoolean,
 } from 'class-validator';
 
 export class TestDto {
   @IsNumber()
   @Expose()
   item_id:number
+}
+
+export class DocumentIdResponseDto{
+  @IsString()
+  @Expose()
+  document_id : string
 }
 
 export class RequirementDetailDto {
@@ -76,6 +83,10 @@ export class RequirementDocumentResponseDto{
   @Expose()
   status:string
 
+  @IsDate()
+  @Expose()
+  create_date: Date
+
   @Expose()
   @Type(() => RequirementDocumentDto)
   document:RequirementDocumentDto
@@ -93,4 +104,37 @@ export class RequirementDocumentRequestDto{
   @IsString()
   @Expose()
   requirement : string
+}
+
+export class RequirementDocumentLoadDto{
+  @IsString()
+  @Expose()
+  project_id : string
+}
+
+export class RequirementDocumentListResponseDto {
+  @IsBoolean()
+  @Expose()
+  success: boolean;
+  @Expose()
+  @Type(() => RequirementDocumentDto)
+  data: RequirementDocumentResponseDto[];
+  @IsString()
+  @Expose()
+  message: string;
+  @IsNumber()
+  @Expose()
+  total: number;
+}
+
+export class RequirementDocumentSingleResponseDto {
+  @IsBoolean()
+  @Expose()
+  success: boolean;
+  @Expose()
+  @Type(() => RequirementDocumentDto)
+  data: RequirementDocumentResponseDto;
+  @IsString()
+  @Expose()
+  message: string;
 }

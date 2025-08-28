@@ -9,9 +9,5 @@ import {
 
 @Entity('Document')
 export class Document {
-  @PrimaryGeneratedColumn()
-  item_id: number;
 
-  @Column()
-  q: string
 }
