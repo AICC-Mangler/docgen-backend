@@ -5,6 +5,12 @@ import { MemberService } from './services/member.service';
 import { Member } from './entities/member.entity';
 import { DocumentService } from './services/document.service';
 import { DocumentController } from './controllers/document.controller';
+import { ProjectController } from './controllers/project.controller';
+import { ProjectService } from './services/project.service';
+import { Project } from './entities/project.entity';
+import { TimelineController } from './controllers/timeline.controller';
+import { TimelineService } from './services/timeline.service';
+import { Timeline } from './entities/timeline.entity';
 import { HttpModule } from '@nestjs/axios';
 
 @Module({
@@ -15,15 +21,6 @@ import { HttpModule } from '@nestjs/axios';
 })
 export class MemberModule {}
 
-// 이런식으로 아래에 추가 하시면 됩니다요.
-// @Module({
-//   imports: [TypeOrmModule.forFeature([--Entity])],
-//   controllers: [--Controller],
-//   providers: [--Service],
-//   exports: [--Service],
-// })
-// export class --Module {}
-
 @Module({
   imports: [HttpModule],
   controllers: [DocumentController],
@@ -31,3 +28,19 @@ export class MemberModule {}
   exports: [DocumentService],
 })
 export class DocumentModule {}
+
+@Module({
+  imports: [TypeOrmModule.forFeature([Project])],
+  controllers: [ProjectController],
+  providers: [ProjectService],
+  exports: [ProjectService],
+})
+export class ProjectModule {}
+
+@Module({
+  imports: [TypeOrmModule.forFeature([Timeline])],
+  controllers: [TimelineController],
+  providers: [TimelineService],
+  exports: [TimelineService],
+})
+export class TimelineModule {}
