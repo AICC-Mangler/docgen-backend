@@ -22,7 +22,7 @@ export class CreateTimelineDto {
   description: string;
 
   @IsDateString()
-  eventDate: string;
+  event_date: string;
 }
 
 // Timeline 수정 DTO
@@ -40,7 +40,7 @@ export class UpdateTimelineDto {
 
   @IsOptional()
   @IsDateString()
-  eventDate?: string;
+  event_date?: string;
 }
 
 // Timeline 응답 DTO
@@ -58,7 +58,7 @@ export class TimelineResponseDto {
   description: string;
 
   @IsDateString()
-  eventDate: string;
+  event_date: string;
 
   @IsDateString()
   created_date_time: string;

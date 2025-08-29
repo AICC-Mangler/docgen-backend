@@ -18,7 +18,7 @@ export class TimelineService {
   async findAll(): Promise<Timeline[]> {
     try {
       const timelines = await this.timelineRepository.find({
-        order: { eventDate: 'DESC', id: 'ASC' },
+        order: { event_date: 'DESC', id: 'ASC' },
       });
       console.log('DB 연결 성공! Timeline 테이블 조회 완료');
       console.log(`총 ${timelines.length}개의 타임라인을 찾았습니다.`);
@@ -47,7 +47,7 @@ export class TimelineService {
     try {
       const timelines = await this.timelineRepository.find({
         where: { project_id: projectId },
-        order: { eventDate: 'DESC', id: 'ASC' },
+        order: { event_date: 'DESC', id: 'ASC' },
       });
       console.log(`프로젝트 ID ${projectId}의 타임라인 조회 완료`);
       console.log(`총 ${timelines.length}개의 타임라인을 찾았습니다.`);
@@ -75,14 +75,14 @@ export class TimelineService {
     try {
       const timeline = this.timelineRepository.create({
         ...createTimelineDto,
-        eventDate: new Date(createTimelineDto.eventDate),
+        event_date: new Date(createTimelineDto.event_date),
       });
       const savedTimeline = await this.timelineRepository.save(timeline);
       console.log('새 타임라인이 생성되었습니다:', {
         id: savedTimeline.id,
         title: savedTimeline.title,
         project_id: savedTimeline.project_id,
-        eventDate: savedTimeline.eventDate,
+        event_date: savedTimeline.event_date,
       });
       return savedTimeline;
     } catch (error) {
@@ -98,9 +98,9 @@ export class TimelineService {
     try {
       const timeline = await this.findById(id);
 
-      if (updateTimelineDto.eventDate) {
-        updateTimelineDto.eventDate = new Date(updateTimelineDto.eventDate)
-          .toISOString()
+      if (updateTimelineDto.event_date) {
+        updateTimelineDto.event_date = new Date(updateTimelineDto.event_date)
+          .toString()
           .split('T')[0];
       }
 
@@ -110,7 +110,7 @@ export class TimelineService {
         id: updatedTimeline.id,
         title: updatedTimeline.title,
         project_id: updatedTimeline.project_id,
-        eventDate: updatedTimeline.eventDate,
+        event_date: updatedTimeline.event_date,
       });
       return updatedTimeline;
     } catch (error) {
@@ -137,9 +137,9 @@ export class TimelineService {
       project_id: timeline.project_id,
       title: timeline.title,
       description: timeline.description,
-      eventDate: timeline.eventDate.toISOString().split('T')[0],
-      created_date_time: timeline.created_date_time.toISOString(),
-      updated_date_time: timeline.updated_date_time.toISOString(),
+      event_date: timeline.event_date.toString().split('T')[0],
+      created_date_time: timeline.created_date_time.toString(),
+      updated_date_time: timeline.updated_date_time.toString(),
     };
   }
 

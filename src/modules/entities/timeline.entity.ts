@@ -25,7 +25,7 @@ export class Timeline {
   description: string;
 
   @Column({ name: 'event_date', type: 'date' })
-  eventDate: Date;
+  event_date: Date;
 
   @DeleteDateColumn({ name: 'deleted_date_time', type: 'timestamp' })
   deleted_date_time: Date;
