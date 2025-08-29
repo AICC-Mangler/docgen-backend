@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MemberController } from './controllers/member.controller';
-import { MemberService } from './services/member.service';
-import { Member } from './entities/member.entity';
+
+import { PasswordService } from './services/PasswordSerice';
+import { MemberController } from './controllers/MemberController';
+import { MemberService } from './services/MemberServices';
+import { MemberEntity } from './entities/MemberEntity';
 import { DocumentService } from './services/document.service';
 import { DocumentController } from './controllers/document.controller';
 import { ProjectController } from './controllers/project.controller';
@@ -14,9 +16,9 @@ import { Timeline } from './entities/timeline.entity';
 import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Member])],
+  imports: [TypeOrmModule.forFeature([MemberEntity])],
   controllers: [MemberController],
-  providers: [MemberService],
+  providers: [MemberService, PasswordService],
   exports: [MemberService],
 })
 export class MemberModule {}

@@ -15,26 +15,6 @@ export enum MemberRole {
   ADMIN = 'ADMIN',
 }
 
-// Member 생성 DTO
-export class CreateMemberDto {
-  @IsString()
-  @MinLength(1)
-  @MaxLength(10)
-  name: string;
-
-  @IsEmail()
-  @MaxLength(50)
-  email: string;
-
-  @IsEnum(MemberRole)
-  role: MemberRole;
-
-  @IsString()
-  @MinLength(6)
-  @MaxLength(255)
-  password: string;
-}
-
 // Member 수정 DTO
 export class UpdateMemberDto {
   @IsOptional()
