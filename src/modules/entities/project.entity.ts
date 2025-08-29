@@ -7,6 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Timeline } from './timeline.entity';
+import { ProjectStatus } from '../dto/project.dto';
 @Entity('project')
 export class Project {
   @PrimaryGeneratedColumn()
@@ -21,8 +22,13 @@ export class Project {
   @Column({ type: 'text', nullable: false })
   introduction: string;
 
-  @Column({ type: 'date', nullable: false })
-  project_status: string;
+  @Column({
+    type: 'varchar',
+    length: 15,
+    enum: ProjectStatus,
+    nullable: false,
+  })
+  project_status: ProjectStatus;
 
   @CreateDateColumn({
     name: 'created_date_time',

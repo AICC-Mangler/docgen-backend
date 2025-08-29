@@ -8,8 +8,8 @@ import {
 
 export enum ProjectStatus {
   COMPLETED = 'COMPLETED',
-  IN_PROGRSS = 'IN_PROGRESS',
-  PENDEING = 'PENDING',
+  IN_PROGRESS = 'IN_PROGRESS',
+  PENDING = 'PENDING',
 }
 
 export class CreateProjectDto {

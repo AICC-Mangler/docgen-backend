@@ -6,6 +6,7 @@ import {
   Delete,
   Param,
   Body,
+  Query,
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
@@ -21,34 +22,9 @@ import {
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
-  @Get()
-  async getAllProjects(): Promise<ProjectListResponseDto> {
-    try {
-      console.log('=== 프로젝트 전체 조회 요청 ===');
-      const projects = await this.projectService.findAllForResponse();
-
-      return {
-        success: true,
-        data: projects,
-        message: '프로젝트 목록',
-        total: projects.length,
-      };
-    } catch (error) {
-      console.error('컨트롤러 오류:', error);
-      throw new HttpException(
-        {
-          success: false,
-          message: `프로젝트 조회 실패: ${error.message}`,
-          error: error.message,
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
-  @Get(':id')
+  @Get('')
   async getProjectById(
-    @Param('id') memberId: number,
+    @Query('id') memberId: number,
   ): Promise<ProjectSingleResponseDto> {
     try {
       if (isNaN(memberId)) {

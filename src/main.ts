@@ -10,15 +10,17 @@ async function bootstrap() {
   const corsOrigins = process.env.CORS_ORIGINS
     ? process.env.CORS_ORIGINS.split(',').map((origin) => origin.trim())
     : [
-        'http://localhost:5173', // 로컬 프론트엔드
+        'http://localhost:5173', // 로컬 프론트엔드 (Vite 기본)
+        'http://localhost:8181', // 로컬 프론트엔드 (현재 포트)
         'http://localhost:3100', // 로컬 프론트엔드 (다른 포트)
         'https://docgen.aicc-project.com', // 배포된 프론트엔드
         'https://www.docgen.aicc-project.com', // www 서브도메인
       ];
 
+  // CORS 설정을 더 명시적으로
   app.enableCors({
-    origin: corsOrigins,
-    credentials: true, // 쿠키, 인증 헤더 허용
+    origin: true, // 모든 origin 허용 (개발 환경)
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: [
       'Origin',
@@ -28,6 +30,8 @@ async function bootstrap() {
       'Authorization',
       'X-API-Key',
     ],
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
   });
 
   // Validation pipe 추가

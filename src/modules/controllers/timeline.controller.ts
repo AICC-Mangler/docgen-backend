@@ -23,9 +23,9 @@ import { ProjectListResponseDto } from '../dto/project.dto';
 export class TimelineController {
   constructor(private readonly timelineService: TimelineService) {}
 
-  @Get(':id')
+  @Get('')
   async getAllProjectsByMemberId(
-    @Param('id') id: number,
+    @Query('id') id: number,
   ): Promise<ProjectListResponseDto> {
     try {
       console.log('=== 해당 멤버의 프로젝트 전체 조회 요청 ===');
