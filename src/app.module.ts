@@ -7,7 +7,12 @@ import { typeOrmConfig } from './config/typeorm.config';
 import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(typeOrmConfig), MemberModule,HttpModule,DocumentModule],
+  imports: [
+    TypeOrmModule.forRoot(typeOrmConfig),
+    MemberModule,
+    HttpModule,
+    DocumentModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

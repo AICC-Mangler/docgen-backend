@@ -1,7 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { AxiosRequestConfig } from 'axios';
-
+import { config } from 'dotenv';
 
 export async function safeRequest<T>(
   httpService: HttpService,
@@ -22,7 +22,20 @@ export async function safeRequest<T>(
     } else {
       console.error('Unknown error:', err);
     }
-    throw ""; // 필요 시 커스텀 에러로 변환
-    
+    throw ''; // 필요 시 커스텀 에러로 변환
   }
+}
+
+export async function requestFastApi<T>(
+  httpService: HttpService,
+  method: 'get' | 'post' | 'put' | 'delete',
+  url: string,
+  config?: AxiosRequestConfig,
+): Promise<T> {
+  return safeRequest(
+    httpService,
+    method,
+    `${process.env.FASTAPI_URL}${url}`,
+    config,
+  );
 }

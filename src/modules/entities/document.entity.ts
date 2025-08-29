@@ -8,6 +8,4 @@ import {
 } from 'typeorm';
 
 @Entity('Document')
-export class Document {
-
-}
+export class Document {}

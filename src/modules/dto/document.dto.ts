@@ -15,13 +15,13 @@ import {
 export class TestDto {
   @IsNumber()
   @Expose()
-  item_id:number
+  item_id: number;
 }
 
-export class DocumentIdResponseDto{
+export class DocumentIdResponseDto {
   @IsString()
   @Expose()
-  document_id : string
+  document_id: string;
 }
 
 export class RequirementDetailDto {
@@ -55,7 +55,7 @@ export class RequirementMetadataDto {
   requirement_summary: string;
 }
 
-export class RequirementDocumentDto{
+export class RequirementDocumentDto {
   @Expose()
   name: string;
 
@@ -70,46 +70,46 @@ export class RequirementDocumentDto{
   data: RequirementDto[];
 }
 
-export class RequirementDocumentResponseDto{
+export class RequirementDocumentResponseDto {
   @IsString()
   @Expose()
-  owner_id:string
+  owner_id: string;
 
   @IsString()
   @Expose()
-  project_id:string
+  project_id: string;
 
   @IsString()
   @Expose()
-  status:string
+  status: string;
 
   @IsDate()
   @Expose()
-  create_date: Date
+  create_date: Date;
 
   @Expose()
   @Type(() => RequirementDocumentDto)
-  document:RequirementDocumentDto
+  document: RequirementDocumentDto;
 }
 
-export class RequirementDocumentRequestDto{
+export class RequirementDocumentRequestDto {
   @IsString()
   @Expose()
-  owner_id : string
+  owner_id: string;
 
   @IsString()
   @Expose()
-  project_id : string
+  project_id: string;
 
   @IsString()
   @Expose()
-  requirement : string
+  requirement: string;
 }
 
-export class RequirementDocumentLoadDto{
+export class RequirementDocumentLoadDto {
   @IsString()
   @Expose()
-  project_id : string
+  project_id: string;
 }
 
 export class RequirementDocumentListResponseDto {
