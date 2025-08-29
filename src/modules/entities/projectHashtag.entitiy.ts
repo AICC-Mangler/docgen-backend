@@ -2,27 +2,26 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
+  DeleteDateColumn,
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
 import { Timeline } from './timeline.entity';
-@Entity('project')
-export class Project {
-  @PrimaryGeneratedColumn()
-  id: number;
+
+@Entity('projectHashtag')
+export class ProjectHashtag {
+  @Column({ type: 'bigint', nullable: false })
+  project_id: number;
 
   @Column({ type: 'bigint', nullable: false })
-  member_id: number;
+  hashtag_id: number;
 
-  @Column({ type: 'varchar', length: 255, nullable: false })
-  title: string;
-
-  @Column({ type: 'text', nullable: false })
-  introduction: string;
-
-  @Column({ type: 'date', nullable: false })
-  project_status: string;
+  @DeleteDateColumn({
+    name: 'deleted_date_time',
+    type: 'timestamp',
+  })
+  deleted_date_time: Date;
 
   @CreateDateColumn({
     name: 'created_date_time',
@@ -38,8 +37,4 @@ export class Project {
     onUpdate: 'CURRENT_TIMESTAMP',
   })
   updated_date_time: Date;
-
-  // 관계 설정: 프로젝트와 타임라인은 1:N 관계
-  @OneToMany(() => Timeline, (timeline) => timeline.project)
-  timelines: Timeline[];
 }

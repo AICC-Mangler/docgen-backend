@@ -29,7 +29,8 @@ export class TimelineController {
   ): Promise<ProjectListResponseDto> {
     try {
       console.log('=== 해당 멤버의 프로젝트 전체 조회 요청 ===');
-      const projects = await this.timelineService.findProjectByMemberId(id);
+      // const projects = await this.timelineService.findProjectByMemberId(id);
+      const projects = await this.timelineService.findAllForResponse();
 
       return {
         success: true,

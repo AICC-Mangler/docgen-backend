@@ -7,15 +7,12 @@ import {
   TimelineResponseDto,
 } from '../dto/timeline.dto';
 import { Timeline } from '../entities/timeline.entity';
-import { Project } from '../entities/project.entity';
 
 @Injectable()
 export class TimelineService {
   constructor(
     @InjectRepository(Timeline)
     private timelineRepository: Repository<Timeline>,
-    @InjectRepository(Project)
-    private projectRepository: Repository<Project>,
   ) {}
 
   async findAll(): Promise<Timeline[]> {
@@ -32,19 +29,19 @@ export class TimelineService {
     }
   }
 
-  async findProjectByMemberId(memberId: number): Promise<Project[]> {
-    try {
-      const projects = await this.projectRepository.find({
-        where: { member_id: memberId },
-      });
-      console.log(`멤버 ID ${memberId}의 프로젝트 조회 완료`);
-      console.log(`총 ${projects.length}개의 프로젝트를 찾았습니다.`);
-      return projects;
-    } catch (error) {
-      console.error('프로젝트별 타임라인 조회 오류:', error);
-      throw new Error(`프로젝트별 타임라인 조회 실패: ${error.message}`);
-    }
-  }
+  // async findProjectByMemberId(memberId: number): Promise<Project[]> {
+  //   try {
+  //     const projects = await this.projectRepository.find({
+  //       where: { member_id: memberId },
+  //     });
+  //     console.log(`멤버 ID ${memberId}의 프로젝트 조회 완료`);
+  //     console.log(`총 ${projects.length}개의 프로젝트를 찾았습니다.`);
+  //     return projects;
+  //   } catch (error) {
+  //     console.error('프로젝트별 타임라인 조회 오류:', error);
+  //     throw new Error(`프로젝트별 타임라인 조회 실패: ${error.message}`);
+  //   }
+  // }
 
   async findByProjectId(projectId: number): Promise<Timeline[]> {
     try {

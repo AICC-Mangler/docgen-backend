@@ -18,18 +18,34 @@ export class ProjectService {
 
   async findAll(): Promise<Project[]> {
     return await this.projectRepository.find({
-      order: { event_date: 'DESC' },
+      order: { created_date_time: 'DESC' },
+    });
+  }
+
+  // 멤버 ID로 프로젝트 리스트 조회
+  async findAllForResponseByMemberId(memberId: number): Promise<Project[]> {
+    return await this.projectRepository.find({
+      where: { member_id: memberId },
+      order: { created_date_time: 'DESC' },
+      select: [
+        'id',
+        'title',
+        'introduction',
+        'project_status',
+        'created_date_time',
+        'updated_date_time',
+      ],
     });
   }
 
   async findAllForResponse(): Promise<Project[]> {
     return await this.projectRepository.find({
-      order: { event_date: 'DESC' },
+      order: { created_date_time: 'DESC' },
       select: [
         'id',
         'title',
-        'description',
-        'event_date',
+        'introduction',
+        'project_status',
         'created_date_time',
         'updated_date_time',
       ],
@@ -50,8 +66,8 @@ export class ProjectService {
       select: [
         'id',
         'title',
-        'description',
-        'event_date',
+        'introduction',
+        'project_status',
         'created_date_time',
         'updated_date_time',
       ],

@@ -48,24 +48,24 @@ export class ProjectController {
 
   @Get(':id')
   async getProjectById(
-    @Param('id') id: string,
+    @Param('id') memberId: number,
   ): Promise<ProjectSingleResponseDto> {
     try {
-      const projectId = parseInt(id, 10);
-      if (isNaN(projectId)) {
+      if (isNaN(memberId)) {
         throw new HttpException(
-          '유효하지 않은 프로젝트 ID입니다.',
+          '유효하지 않은 멤버 ID입니다.',
           HttpStatus.BAD_REQUEST,
         );
       }
 
-      console.log(`=== 프로젝트 ID ${projectId} 조회 요청 ===`);
-      const project = await this.projectService.findByIdForResponse(projectId);
+      console.log(`=== 멤버 ID ${memberId} 조회 요청 ===`);
+      const project =
+        await this.projectService.findAllForResponseByMemberId(memberId);
 
       return {
         success: true,
         data: project,
-        message: `ID ${projectId}인 프로젝트를 성공적으로 조회했습니다.`,
+        message: `멤버 ID ${memberId}의 프로젝트 리스트를 성공적으로 조회했습니다.`,
       };
     } catch (error) {
       console.error('컨트롤러 오류:', error);
