@@ -12,6 +12,7 @@ import {
 import { DocumentService } from '../services/document.service';
 import {
   DocumentIdResponseDto,
+  RequirementDocumentListResponseDto,
   RequirementDocumentRequestDto,
   RequirementDocumentResponseDto,
   RequirementDocumentSingleResponseDto,
@@ -19,7 +20,7 @@ import {
 } from '../dto/document.dto';
 import type { Response } from 'express';
 
-@Controller('document')
+@Controller('api/document')
 export class DocumentController {
   constructor(private readonly documentService: DocumentService) {}
 
@@ -39,6 +40,30 @@ export class DocumentController {
         {
           success: false,
           message: `문서생성요쳥 실패: ${error.message}`,
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get('requirement/user/:user_id')
+  async getRequirementDocumentListUseUser(
+    @Param('user_id') user_id: string,
+  ): Promise<RequirementDocumentListResponseDto> {
+    try {
+      const document = await this.documentService.find_requirement_document_user(user_id);
+      return {
+        success: true,
+        data: document,
+        message: '문서 검색 성공',
+        total: document.length
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          success: false,
+          message: `문서 검색 실패: ${error.message}`,
           error: error.message,
         },
         HttpStatus.INTERNAL_SERVER_ERROR,

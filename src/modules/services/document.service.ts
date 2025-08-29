@@ -3,6 +3,7 @@ import { InsertResult } from 'typeorm';
 import { HttpService } from '@nestjs/axios';
 import {
   DocumentIdResponseDto,
+  RequirementDocumentListResponseDto,
   RequirementDocumentRequestDto,
   RequirementDocumentResponseDto,
   TestDto,
@@ -46,10 +47,26 @@ export class DocumentService {
     return result;
   }
 
+  async find_requirement_document_user(
+    user_id : string,
+  ): Promise<RequirementDocumentResponseDto[]>{
+    const response = await requestFastApi(
+      this.httpService,
+      'get',
+      `/api/document/requirement/user/${user_id}`,
+    );
+    const result = plainToInstance(RequirementDocumentResponseDto, response, {
+      excludeExtraneousValues: true,
+    });
+    if(Array.isArray(result)){
+      return result;
+    }
+    return [new RequirementDocumentResponseDto()]
+  }
+
   async find_requirement_document(
     document_id: string,
   ): Promise<RequirementDocumentResponseDto> {
-    console.log(document_id['document_id']);
     const response = await requestFastApi(
       this.httpService,
       'get',
@@ -95,7 +112,12 @@ export class DocumentService {
 
     merge_column(sheet, 3);
     merge_column(sheet, 4);
-
+    sheet.eachRow((row, rowNumber) => {
+      row.height = 32;
+    });
+    sheet.getRow(1).eachCell((cell) => {
+      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+    });
     response.setHeader(
       'Content-Type',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
