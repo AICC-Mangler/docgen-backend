@@ -7,6 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Timeline } from './timeline.entity';
+import { ProjectStatus } from '../dto/project.dto';
 
 @Entity('projects')
 export class Project {
@@ -20,15 +21,20 @@ export class Project {
   title: string;
 
   @Column({ type: 'text', nullable: false })
-  description: string;
+  introduction: string;
 
   @Column({ type: 'date', nullable: false })
-  event_date: string;
+  project_status: string;
 
-  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({
+    name: 'created_date_time',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   created_date_time: Date;
 
   @UpdateDateColumn({
+    name: 'updated_date_time',
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
     onUpdate: 'CURRENT_TIMESTAMP',

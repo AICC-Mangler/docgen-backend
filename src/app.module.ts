@@ -20,6 +20,8 @@ import { HttpModule } from '@nestjs/axios';
     MemberModule,
     HttpModule,
     DocumentModule,
+    ProjectModule,
+    TimelineModule,
   ],
   controllers: [AppController],
   providers: [AppService],

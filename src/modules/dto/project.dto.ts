@@ -3,7 +3,14 @@ import {
   IsNotEmpty,
   IsOptional,
   IsDateString,
+  IsEnum,
 } from 'class-validator';
+
+export enum ProjectStatus {
+  COMPLETED = 'COMPLETED',
+  IN_PROGRSS = 'IN_PROGRESS',
+  PENDEING = 'PENDING',
+}
 
 export class CreateProjectDto {
   @IsString()
@@ -12,11 +19,10 @@ export class CreateProjectDto {
 
   @IsString()
   @IsNotEmpty({ message: '프로젝트 설명은 필수입니다.' })
-  description: string;
+  introduction: string;
 
-  @IsDateString()
-  @IsNotEmpty({ message: '이벤트 날짜는 필수입니다.' })
-  event_date: string;
+  @IsEnum(ProjectStatus)
+  project_status: ProjectStatus;
 }
 
 export class UpdateProjectDto {
@@ -28,12 +34,11 @@ export class UpdateProjectDto {
   @IsOptional()
   @IsString()
   @IsNotEmpty({ message: '프로젝트 설명은 비어있을 수 없습니다.' })
-  description?: string;
+  introduction?: string;
 
   @IsOptional()
-  @IsDateString()
-  @IsNotEmpty({ message: '이벤트 날짜는 비어있을 수 없습니다.' })
-  event_date?: string;
+  @IsEnum(ProjectStatus)
+  project_status: ProjectStatus;
 }
 
 export class ProjectListResponseDto {
