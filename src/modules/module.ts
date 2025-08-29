@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { PasswordService } from './services/PasswordSerice';
-import { MemberController } from './controllers/member.controller';
-import { MemberService } from './services/member.service';
-import { MemberEntity } from './entities/member.entity';
+import { MemberController } from './controllers/MemberController';
+import { MemberService } from './services/MemberServices';
+import { MemberEntity } from './entities/MemberEntity';
 import { DocumentService } from './services/document.service';
 import { DocumentController } from './controllers/document.controller';
 import { HttpModule } from '@nestjs/axios';
