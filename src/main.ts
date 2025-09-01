@@ -10,7 +10,7 @@ async function bootstrap() {
   const corsOrigins = process.env.CORS_ORIGINS
     ? process.env.CORS_ORIGINS.split(',').map((origin) => origin.trim())
     : [
-        'http://localhost:5173', // 로컬 프론트엔드
+        'http://localhost:8181', // 로컬 프론트엔드
         'http://localhost:3100', // 로컬 프론트엔드 (다른 포트)
         'https://docgen.aicc-project.com', // 배포된 프론트엔드
         'https://www.docgen.aicc-project.com', // www 서브도메인
