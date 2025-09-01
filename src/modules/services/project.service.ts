@@ -27,7 +27,7 @@ export class ProjectService {
     memberId: number,
   ): Promise<any[]> {
     const query = `
-      SELECT 
+    SELECT
         p.id,
         p.member_id,
         p.title,
@@ -35,18 +35,20 @@ export class ProjectService {
         p.project_status,
         p.created_date_time,
         p.updated_date_time,
-        COALESCE(
-          JSON_AGG(
-            DISTINCT h.hashtag_name
-          ) FILTER (WHERE h.hashtag_name IS NOT NULL),
+		COALESCE(
+  			JSON_AGG(
+    			DISTINCT JSON_BUILD_OBJECT(
+      			'id', h.id,
+      			'hashtag_name', h.hashtag_name)::jsonb
+		)FILTER (WHERE h.id IS NOT NULL),
           '[]'::json
         ) as hashtags
       FROM project p
       LEFT JOIN project_hashtag ph ON p.id = ph.project_id AND ph.deleted_date_time IS NULL
-      LEFT JOIN hashtag h ON ph.hashtag_id = h.id AND h.deleted_date_time IS NULL
+      LEFT JOIN hashtag h ON ph.hashtag_id = h.id
       WHERE p.member_id = $1 AND p.deleted_date_time IS NULL
       GROUP BY p.id, p.member_id, p.title, p.introduction, p.project_status, p.created_date_time, p.updated_date_time
-      ORDER BY p.created_date_time DESC
+      ORDER BY p.created_date_time DESC;
     `;
 
     const result = await this.dataSource.query(query, [memberId]);
@@ -72,7 +74,7 @@ export class ProjectService {
         ) as hashtags
       FROM project p
       LEFT JOIN project_hashtag ph ON p.id = ph.project_id AND ph.deleted_date_time IS NULL
-      LEFT JOIN hashtag h ON ph.hashtag_id = h.id AND h.deleted_date_time IS NULL
+      LEFT JOIN hashtag h ON ph.hashtag_id = h.id
       WHERE p.id = $1 AND p.deleted_date_time IS NULL
       GROUP BY p.id, p.member_id, p.title, p.introduction, p.project_status, p.created_date_time, p.updated_date_time
     `;
@@ -152,7 +154,7 @@ export class ProjectService {
       UPDATE project_hashtag 
       SET deleted_date_time = CURRENT_TIMESTAMP, updated_date_time = CURRENT_TIMESTAMP
       WHERE project_id = $1 AND hashtag_id = (
-        SELECT id FROM hashtag WHERE hashtag_name = $2 AND deleted_date_time IS NULL
+        SELECT id FROM hashtag WHERE hashtag_name = $2
       ) AND deleted_date_time IS NULL
     `;
 
@@ -340,17 +342,6 @@ export class ProjectService {
     }
   }
 
-  // Raw SQL을 사용한 프로젝트 삭제 (Soft Delete)
-  async deleteProjectRaw(projectId: number): Promise<void> {
-    const query = `
-      UPDATE project 
-      SET deleted_date_time = CURRENT_TIMESTAMP, updated_date_time = CURRENT_TIMESTAMP
-      WHERE id = $1
-    `;
-
-    await this.dataSource.query(query, [projectId]);
-  }
-
   // DTO 변환 헬퍼 메서드
   toResponseDto(project: Project): ProjectResponseDto {
     return {
@@ -361,7 +352,7 @@ export class ProjectService {
       project_status: project.project_status,
       created_date_time: project.created_date_time.toString(),
       updated_date_time: project.updated_date_time.toString(),
-      hashtags: project.hashtags?.map((h) => h.hashtag_name) || [],
+      hashtags: project.hashtags.map((h) => h.hashtag_name) || [],
     };
   }
 
@@ -380,51 +371,6 @@ export class ProjectService {
     }
 
     return savedProject;
-  }
-
-  async findAll(): Promise<Project[]> {
-    return await this.projectRepository.find({
-      order: { created_date_time: 'DESC' },
-    });
-  }
-
-  // 멤버 ID로 프로젝트 리스트 조회 (해시태그 포함)
-  async findAllWithHashtagsByMemberId(memberId: number): Promise<Project[]> {
-    return await this.projectRepository.find({
-      where: { member_id: memberId },
-      relations: ['hashtags'],
-      order: { created_date_time: 'DESC' },
-    });
-  }
-
-  // 멤버 ID로 프로젝트 리스트 조회 (해시태그 미포함)
-  async findAllForResponseByMemberId(memberId: number): Promise<Project[]> {
-    return await this.projectRepository.find({
-      where: { member_id: memberId },
-      order: { created_date_time: 'DESC' },
-      select: [
-        'id',
-        'title',
-        'introduction',
-        'project_status',
-        'created_date_time',
-        'updated_date_time',
-      ],
-    });
-  }
-
-  async findAllForResponse(): Promise<Project[]> {
-    return await this.projectRepository.find({
-      order: { created_date_time: 'DESC' },
-      select: [
-        'id',
-        'title',
-        'introduction',
-        'project_status',
-        'created_date_time',
-        'updated_date_time',
-      ],
-    });
   }
 
   async findById(id: number): Promise<Project> {
@@ -459,24 +405,6 @@ export class ProjectService {
     return project;
   }
 
-  async findByIdForResponse(id: number): Promise<Project> {
-    const project = await this.projectRepository.findOne({
-      where: { id },
-      select: [
-        'id',
-        'title',
-        'introduction',
-        'project_status',
-        'created_date_time',
-        'updated_date_time',
-      ],
-    });
-    if (!project) {
-      throw new NotFoundException(`ID ${id}인 프로젝트를 찾을 수 없습니다.`);
-    }
-    return project;
-  }
-
   async update(
     id: number,
     updateProjectDto: UpdateProjectDto,
@@ -494,9 +422,12 @@ export class ProjectService {
       project.hashtags = [];
       await this.projectRepository.save(project);
 
+      // 해시태그 배열 처리
+      const hashtagArray = hashtags.filter((tag) => tag.trim().length > 0); // 빈 문자열 제거
+
       // 새 해시태그 추가
-      if (hashtags.length > 0) {
-        for (const hashtagName of hashtags) {
+      if (hashtagArray.length > 0) {
+        for (const hashtagName of hashtagArray) {
           await this.addHashtagToProject(updatedProject.id, hashtagName);
         }
       }
@@ -508,16 +439,6 @@ export class ProjectService {
   async remove(id: number): Promise<void> {
     const project = await this.findById(id);
     await this.projectRepository.remove(project);
-  }
-
-  // 해시태그로 프로젝트 검색
-  async findProjectsByHashtag(hashtagName: string): Promise<Project[]> {
-    return await this.projectRepository
-      .createQueryBuilder('project')
-      .leftJoinAndSelect('project.hashtags', 'hashtag')
-      .where('hashtag.hashtag_name = :hashtagName', { hashtagName })
-      .orderBy('project.created_date_time', 'DESC')
-      .getMany();
   }
 
   // 프로젝트에 해시태그 추가
@@ -535,13 +456,18 @@ export class ProjectService {
       hashtag = await this.hashtagRepository.save(hashtag);
     }
 
-    // 프로젝트에 해시태그 연결
-    const project = await this.findById(projectId);
+    // 프로젝트에 해시태그 연결 (기존 해시태그 관계를 포함하여 조회)
+    const project = await this.findByIdWithHashtags(projectId);
     if (!project.hashtags) {
       project.hashtags = [];
     }
-    project.hashtags.push(hashtag);
-    await this.projectRepository.save(project);
+
+    // 이미 존재하는 해시태그인지 확인
+    const existingHashtag = project.hashtags.find((h) => h.id === hashtag.id);
+    if (!existingHashtag) {
+      project.hashtags.push(hashtag);
+      await this.projectRepository.save(project);
+    }
   }
 
   // 프로젝트에서 해시태그 제거
