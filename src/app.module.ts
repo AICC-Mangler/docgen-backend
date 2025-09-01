@@ -22,6 +22,7 @@ import { HttpModule } from '@nestjs/axios';
     DocumentModule,
     ProjectModule,
     TimelineModule,
+    AuthenticationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
