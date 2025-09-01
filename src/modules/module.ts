@@ -10,6 +10,8 @@ import { DocumentController } from './controllers/document.controller';
 import { ProjectController } from './controllers/project.controller';
 import { ProjectService } from './services/project.service';
 import { Project } from './entities/project.entity';
+import { Hashtag } from './entities/hashtag.entity';
+import { ProjectHashtag } from './entities/projectHashtag.entity';
 import { TimelineController } from './controllers/timeline.controller';
 import { TimelineService } from './services/timeline.service';
 import { Timeline } from './entities/timeline.entity';
@@ -32,7 +34,7 @@ export class MemberModule {}
 export class DocumentModule {}
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Project])],
+  imports: [TypeOrmModule.forFeature([Project, Hashtag, ProjectHashtag])],
   controllers: [ProjectController],
   providers: [ProjectService],
   exports: [ProjectService],
@@ -40,7 +42,7 @@ export class DocumentModule {}
 export class ProjectModule {}
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Timeline])],
+  imports: [TypeOrmModule.forFeature([Timeline, Project])],
   controllers: [TimelineController],
   providers: [TimelineService],
   exports: [TimelineService],

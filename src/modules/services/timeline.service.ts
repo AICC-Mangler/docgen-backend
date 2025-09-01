@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {
@@ -21,7 +21,7 @@ export class TimelineService {
   async findAll(): Promise<Timeline[]> {
     try {
       const timelines = await this.timelineRepository.find({
-        order: { eventDate: 'DESC', id: 'ASC' },
+        order: { event_date: 'DESC', id: 'ASC' },
       });
       console.log('DB 연결 성공! Timeline 테이블 조회 완료');
       console.log(`총 ${timelines.length}개의 타임라인을 찾았습니다.`);
@@ -32,25 +32,25 @@ export class TimelineService {
     }
   }
 
-  async findProjectByMemberId(memberId: number): Promise<Project[]> {
-    try {
-      const projects = await this.projectRepository.find({
-        where: { member_id: memberId },
-      });
-      console.log(`멤버 ID ${memberId}의 프로젝트 조회 완료`);
-      console.log(`총 ${projects.length}개의 프로젝트를 찾았습니다.`);
-      return projects;
-    } catch (error) {
-      console.error('프로젝트별 타임라인 조회 오류:', error);
-      throw new Error(`프로젝트별 타임라인 조회 실패: ${error.message}`);
-    }
-  }
+  // async findProjectByMemberId(memberId: number): Promise<Project[]> {
+  //   try {
+  //     const projects = await this.projectRepository.find({
+  //       where: { member_id: memberId },
+  //     });
+  //     console.log(`멤버 ID ${memberId}의 프로젝트 조회 완료`);
+  //     console.log(`총 ${projects.length}개의 프로젝트를 찾았습니다.`);
+  //     return projects;
+  //   } catch (error) {
+  //     console.error('프로젝트별 타임라인 조회 오류:', error);
+  //     throw new Error(`프로젝트별 타임라인 조회 실패: ${error.message}`);
+  //   }
+  // }
 
   async findByProjectId(projectId: number): Promise<Timeline[]> {
     try {
       const timelines = await this.timelineRepository.find({
         where: { project_id: projectId },
-        order: { eventDate: 'DESC', id: 'ASC' },
+        order: { event_date: 'DESC', id: 'ASC' },
       });
       console.log(`프로젝트 ID ${projectId}의 타임라인 조회 완료`);
       console.log(`총 ${timelines.length}개의 타임라인을 찾았습니다.`);
@@ -76,20 +76,37 @@ export class TimelineService {
 
   async create(createTimelineDto: CreateTimelineDto): Promise<Timeline> {
     try {
-      const timeline = this.timelineRepository.create({
-        ...createTimelineDto,
-        eventDate: new Date(createTimelineDto.eventDate),
+      // 프로젝트 존재 여부 확인
+      const project = await this.projectRepository.findOne({
+        where: { id: createTimelineDto.project_id },
       });
+
+      if (!project) {
+        throw new NotFoundException(
+          `프로젝트 ID ${createTimelineDto.project_id}를 찾을 수 없습니다.`,
+        );
+      }
+
+      // 새로운 타임라인 엔티티 생성
+      const timeline = new Timeline();
+      timeline.project_id = createTimelineDto.project_id;
+      timeline.title = createTimelineDto.title;
+      timeline.description = createTimelineDto.description;
+      timeline.event_date = new Date(createTimelineDto.event_date);
+
       const savedTimeline = await this.timelineRepository.save(timeline);
       console.log('새 타임라인이 생성되었습니다:', {
         id: savedTimeline.id,
         title: savedTimeline.title,
         project_id: savedTimeline.project_id,
-        eventDate: savedTimeline.eventDate,
+        event_date: savedTimeline.event_date,
       });
       return savedTimeline;
     } catch (error) {
       console.error('타임라인 생성 오류:', error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       throw new Error(`타임라인 생성 실패: ${error.message}`);
     }
   }
@@ -101,23 +118,30 @@ export class TimelineService {
     try {
       const timeline = await this.findById(id);
 
-      if (updateTimelineDto.eventDate) {
-        updateTimelineDto.eventDate = new Date(updateTimelineDto.eventDate)
-          .toISOString()
-          .split('T')[0];
+      // 업데이트할 필드들만 적용
+      if (updateTimelineDto.title !== undefined) {
+        timeline.title = updateTimelineDto.title;
+      }
+      if (updateTimelineDto.description !== undefined) {
+        timeline.description = updateTimelineDto.description;
+      }
+      if (updateTimelineDto.event_date !== undefined) {
+        timeline.event_date = new Date(updateTimelineDto.event_date);
       }
 
-      Object.assign(timeline, updateTimelineDto);
       const updatedTimeline = await this.timelineRepository.save(timeline);
       console.log('타임라인이 수정되었습니다:', {
         id: updatedTimeline.id,
         title: updatedTimeline.title,
         project_id: updatedTimeline.project_id,
-        eventDate: updatedTimeline.eventDate,
+        event_date: updatedTimeline.event_date,
       });
       return updatedTimeline;
     } catch (error) {
       console.error('타임라인 수정 오류:', error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       throw new Error(`타임라인 수정 실패: ${error.message}`);
     }
   }
@@ -140,9 +164,9 @@ export class TimelineService {
       project_id: timeline.project_id,
       title: timeline.title,
       description: timeline.description,
-      eventDate: timeline.eventDate.toISOString().split('T')[0],
-      created_date_time: timeline.created_date_time.toISOString(),
-      updated_date_time: timeline.updated_date_time.toISOString(),
+      event_date: timeline.event_date.toString().split('T')[0],
+      created_date_time: timeline.created_date_time.toString(),
+      updated_date_time: timeline.updated_date_time.toString(),
     };
   }
 
