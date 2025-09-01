@@ -6,6 +6,8 @@ import {
   RequirementDocumentListResponseDto,
   RequirementDocumentRequestDto,
   RequirementDocumentResponseDto,
+  RequirementQuestionsDto,
+  RequirementQuestionsResponseDto,
   TestDto,
 } from '../dto/document.dto';
 import { firstValueFrom } from 'rxjs';
@@ -46,7 +48,21 @@ export class DocumentService {
     });
     return result;
   }
-
+  async generate_requirement_questions(
+    questions: RequirementQuestionsDto,
+  ): Promise<RequirementQuestionsDto> {
+    const payload = JSON.parse(JSON.stringify(questions));
+    const response = await requestFastApi(
+      this.httpService,
+      'post',
+      '/api/document/requirement/question',
+      { data: payload },
+    );
+    const result = plainToInstance(RequirementQuestionsDto, response, {
+      excludeExtraneousValues: true,
+    });
+    return result;
+  }
   async find_requirement_document_user(
     user_id : string,
   ): Promise<RequirementDocumentResponseDto[]>{
@@ -63,7 +79,22 @@ export class DocumentService {
     }
     return [new RequirementDocumentResponseDto()]
   }
-
+  async find_requirement_document_project_id(
+    project_id : string,
+  ): Promise<RequirementDocumentResponseDto[]>{
+    const response = await requestFastApi(
+      this.httpService,
+      'get',
+      `/api/document/requirement/project/${project_id}`,
+    );
+    const result = plainToInstance(RequirementDocumentResponseDto, response, {
+      excludeExtraneousValues: true,
+    });
+    if(Array.isArray(result)){
+      return result;
+    }
+    return [new RequirementDocumentResponseDto()]
+  }
   async find_requirement_document(
     document_id: string,
   ): Promise<RequirementDocumentResponseDto> {
