@@ -5,23 +5,28 @@ import {
   IsDateString,
   MinLength,
   MaxLength,
+  IsNotEmpty,
 } from 'class-validator';
 
 // Timeline 생성 DTO
 export class CreateTimelineDto {
   @IsNumber()
+  @IsNotEmpty({ message: '프로젝트 ID는 필수입니다.' })
   project_id: number;
 
   @IsString()
-  @MinLength(1)
-  @MaxLength(25)
+  @IsNotEmpty({ message: '제목은 필수입니다.' })
+  @MinLength(1, { message: '제목은 최소 1자 이상이어야 합니다.' })
+  @MaxLength(25, { message: '제목은 최대 25자까지 가능합니다.' })
   title: string;
 
   @IsString()
-  @MaxLength(100)
+  @IsNotEmpty({ message: '설명은 필수입니다.' })
+  @MaxLength(100, { message: '설명은 최대 100자까지 가능합니다.' })
   description: string;
 
-  @IsDateString()
+  @IsDateString({}, { message: '유효한 날짜 형식이어야 합니다. (YYYY-MM-DD)' })
+  @IsNotEmpty({ message: '이벤트 날짜는 필수입니다.' })
   event_date: string;
 }
 
@@ -29,17 +34,17 @@ export class CreateTimelineDto {
 export class UpdateTimelineDto {
   @IsOptional()
   @IsString()
-  @MinLength(1)
-  @MaxLength(25)
+  @MinLength(1, { message: '제목은 최소 1자 이상이어야 합니다.' })
+  @MaxLength(25, { message: '제목은 최대 25자까지 가능합니다.' })
   title?: string;
 
   @IsOptional()
   @IsString()
-  @MaxLength(100)
+  @MaxLength(100, { message: '설명은 최대 100자까지 가능합니다.' })
   description?: string;
 
   @IsOptional()
-  @IsDateString()
+  @IsDateString({}, { message: '유효한 날짜 형식이어야 합니다. (YYYY-MM-DD)' })
   event_date?: string;
 }
 

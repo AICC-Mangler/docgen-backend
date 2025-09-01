@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {
@@ -7,12 +7,15 @@ import {
   TimelineResponseDto,
 } from '../dto/timeline.dto';
 import { Timeline } from '../entities/timeline.entity';
+import { Project } from '../entities/project.entity';
 
 @Injectable()
 export class TimelineService {
   constructor(
     @InjectRepository(Timeline)
     private timelineRepository: Repository<Timeline>,
+    @InjectRepository(Project)
+    private projectRepository: Repository<Project>,
   ) {}
 
   async findAll(): Promise<Timeline[]> {
@@ -73,10 +76,24 @@ export class TimelineService {
 
   async create(createTimelineDto: CreateTimelineDto): Promise<Timeline> {
     try {
-      const timeline = this.timelineRepository.create({
-        ...createTimelineDto,
-        event_date: new Date(createTimelineDto.event_date),
+      // 프로젝트 존재 여부 확인
+      const project = await this.projectRepository.findOne({
+        where: { id: createTimelineDto.project_id },
       });
+
+      if (!project) {
+        throw new NotFoundException(
+          `프로젝트 ID ${createTimelineDto.project_id}를 찾을 수 없습니다.`,
+        );
+      }
+
+      // 새로운 타임라인 엔티티 생성
+      const timeline = new Timeline();
+      timeline.project_id = createTimelineDto.project_id;
+      timeline.title = createTimelineDto.title;
+      timeline.description = createTimelineDto.description;
+      timeline.event_date = new Date(createTimelineDto.event_date);
+
       const savedTimeline = await this.timelineRepository.save(timeline);
       console.log('새 타임라인이 생성되었습니다:', {
         id: savedTimeline.id,
@@ -87,6 +104,9 @@ export class TimelineService {
       return savedTimeline;
     } catch (error) {
       console.error('타임라인 생성 오류:', error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       throw new Error(`타임라인 생성 실패: ${error.message}`);
     }
   }
@@ -98,13 +118,17 @@ export class TimelineService {
     try {
       const timeline = await this.findById(id);
 
-      if (updateTimelineDto.event_date) {
-        updateTimelineDto.event_date = new Date(updateTimelineDto.event_date)
-          .toString()
-          .split('T')[0];
+      // 업데이트할 필드들만 적용
+      if (updateTimelineDto.title !== undefined) {
+        timeline.title = updateTimelineDto.title;
+      }
+      if (updateTimelineDto.description !== undefined) {
+        timeline.description = updateTimelineDto.description;
+      }
+      if (updateTimelineDto.event_date !== undefined) {
+        timeline.event_date = new Date(updateTimelineDto.event_date);
       }
 
-      Object.assign(timeline, updateTimelineDto);
       const updatedTimeline = await this.timelineRepository.save(timeline);
       console.log('타임라인이 수정되었습니다:', {
         id: updatedTimeline.id,
@@ -115,6 +139,9 @@ export class TimelineService {
       return updatedTimeline;
     } catch (error) {
       console.error('타임라인 수정 오류:', error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       throw new Error(`타임라인 수정 실패: ${error.message}`);
     }
   }

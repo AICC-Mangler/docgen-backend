@@ -9,6 +9,8 @@ import {
   Query,
   HttpException,
   HttpStatus,
+  ValidationPipe,
+  UsePipes,
 } from '@nestjs/common';
 import { TimelineService } from '../services/timeline.service';
 import {
@@ -62,73 +64,8 @@ export class TimelineController {
     }
   }
 
-  @Get('')
-  async getAllProjectsByMemberId(
-    @Query('id') id: number,
-  ): Promise<ProjectListResponseDto> {
-    try {
-      console.log('=== 해당 멤버의 프로젝트 전체 조회 요청 ===');
-      // const projects = await this.timelineService.findProjectByMemberId(id);
-      const projects = await this.timelineService.findAllForResponse();
-
-      return {
-        success: true,
-        data: projects,
-        message: 'Projects List',
-        total: projects.length,
-      };
-    } catch (error) {
-      console.error('컨트롤러 오류:', error);
-      throw new HttpException(
-        {
-          success: false,
-          message: `프로젝트 조회 실패: ${error.message}`,
-          error: error.message,
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
-  //   @Get(':id')
-  //   async getTimelineById(
-  //     @Param('id') id: string,
-  //   ): Promise<TimelineSingleResponseDto> {
-  //     try {
-  //       const timelineId = parseInt(id, 10);
-  //       if (isNaN(timelineId)) {
-  //         throw new HttpException(
-  //           '유효하지 않은 ID입니다.',
-  //           HttpStatus.BAD_REQUEST,
-  //         );
-  //       }
-
-  //       console.log(`=== Timeline ID ${timelineId} 조회 요청 ===`);
-  //       const timeline =
-  //         await this.timelineService.findByIdForResponse(timelineId);
-
-  //       return {
-  //         success: true,
-  //         data: timeline,
-  //         message: `ID ${timelineId}인 타임라인을 성공적으로 조회했습니다.`,
-  //       };
-  //     } catch (error) {
-  //       console.error('컨트롤러 오류:', error);
-  //       if (error instanceof HttpException) {
-  //         throw error;
-  //       }
-  //       throw new HttpException(
-  //         {
-  //           success: false,
-  //           message: `타임라인 조회 실패: ${error.message}`,
-  //           error: error.message,
-  //         },
-  //         HttpStatus.INTERNAL_SERVER_ERROR,
-  //       );
-  //     }
-  //   }
-
   @Post()
+  @UsePipes(new ValidationPipe({ transform: true }))
   async createTimeline(
     @Body() createTimelineDto: CreateTimelineDto,
   ): Promise<TimelineSingleResponseDto> {
@@ -153,6 +90,23 @@ export class TimelineController {
       };
     } catch (error) {
       console.error('컨트롤러 오류:', error);
+
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      // NotFoundException 처리
+      if (error.message.includes('찾을 수 없습니다')) {
+        throw new HttpException(
+          {
+            success: false,
+            message: error.message,
+            error: error.message,
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
       throw new HttpException(
         {
           success: false,
@@ -165,6 +119,7 @@ export class TimelineController {
   }
 
   @Put(':id')
+  @UsePipes(new ValidationPipe({ transform: true }))
   async updateTimeline(
     @Param('id') id: string,
     @Body() updateTimelineDto: UpdateTimelineDto,
@@ -179,6 +134,8 @@ export class TimelineController {
       }
 
       console.log(`=== Timeline ID ${timelineId} 수정 요청 ===`);
+      console.log('수정 데이터:', updateTimelineDto);
+
       const updatedTimeline = await this.timelineService.update(
         timelineId,
         updateTimelineDto,
@@ -194,6 +151,23 @@ export class TimelineController {
       };
     } catch (error) {
       console.error('컨트롤러 오류:', error);
+
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      // NotFoundException 처리
+      if (error.message.includes('찾을 수 없습니다')) {
+        throw new HttpException(
+          {
+            success: false,
+            message: error.message,
+            error: error.message,
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
       throw new HttpException(
         {
           success: false,
@@ -227,6 +201,23 @@ export class TimelineController {
       };
     } catch (error) {
       console.error('컨트롤러 오류:', error);
+
+      if (error instanceof HttpException) {
+        throw error;
+      }
+
+      // NotFoundException 처리
+      if (error.message.includes('찾을 수 없습니다')) {
+        throw new HttpException(
+          {
+            success: false,
+            message: error.message,
+            error: error.message,
+          },
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
       throw new HttpException(
         {
           success: false,

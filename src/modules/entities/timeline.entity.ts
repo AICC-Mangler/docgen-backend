@@ -12,7 +12,7 @@ import { Project } from './project.entity';
 
 @Entity('timeline')
 export class Timeline {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('increment')
   id: number;
 
   @Column({ name: 'project_id', type: 'bigint' })
@@ -45,7 +45,9 @@ export class Timeline {
   updated_date_time: Date;
 
   // 프로젝트와의 관계 설정
-  @ManyToOne(() => Project, (project) => project.timelines)
+  @ManyToOne(() => Project, (project) => project.timelines, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'project_id' })
   project: Project;
 }
