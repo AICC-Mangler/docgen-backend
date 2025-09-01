@@ -160,4 +160,15 @@ export class DocumentService {
     await workbook.xlsx.write(response);
     response.end();
   }
+
+  async find_documents_project_id(
+    project_id : string,
+  ){
+    const response = await requestFastApi(
+      this.httpService,
+      'get',
+      `/api/project/${project_id}`,
+    );
+    return response;
+  }
 }

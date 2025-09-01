@@ -170,6 +170,40 @@ export class DocumentController {
     @Param('document_id') document_id: string,
     @Res() response: Response,
   ) {
-    this.documentService.generate_requirement_excel(document_id, response);
+    try {
+      this.documentService.generate_requirement_excel(document_id, response);
+    } catch (error) {
+      throw new HttpException(
+        {
+          success: false,
+          message: `엑셀 생성 실패: ${error.message}`,
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get('project/:project_id')
+  async getDocumentList(
+    @Param('project_id') project_id: string,
+  ){
+    try {
+      const documents = await this.documentService.find_documents_project_id(project_id);
+      return {
+        success: true,
+        data : documents,
+        message: '로드 완료',
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          success: false,
+          message: `문서 로드 실패: ${error.message}`,
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }
