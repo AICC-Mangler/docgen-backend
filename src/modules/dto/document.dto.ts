@@ -10,6 +10,7 @@ import {
   IsDate,
   ValidateNested,
   IsBoolean,
+  IsArray,
 } from 'class-validator';
 
 export class TestDto {
@@ -73,6 +74,9 @@ export class RequirementDocumentDto {
 export class RequirementDocumentResponseDto {
   @IsString()
   @Expose()
+  id: string;
+  @IsString()
+  @Expose()
   owner_id: string;
 
   @IsString()
@@ -134,6 +138,26 @@ export class RequirementDocumentSingleResponseDto {
   @Expose()
   @Type(() => RequirementDocumentDto)
   data: RequirementDocumentResponseDto;
+  @IsString()
+  @Expose()
+  message: string;
+}
+
+export class RequirementQuestionsDto {
+  @Expose()
+  @IsArray()
+  @IsString({ each: true })
+  @Type(() => String)
+  questions : string[];
+}
+
+export class RequirementQuestionsResponseDto{
+  @IsBoolean()
+  @Expose()
+  success: boolean;
+  @Expose()
+  @Type(() => RequirementQuestionsDto)
+  data: RequirementQuestionsDto;
   @IsString()
   @Expose()
   message: string;
