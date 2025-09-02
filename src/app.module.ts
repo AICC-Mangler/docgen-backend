@@ -8,6 +8,7 @@ import {
   ProjectModule,
   TimelineModule,
   DocumentModule,
+  NoticeModule,
 } from './modules/module';
 import { AuthenticationModule } from './modules/authentication.module';
 import { typeOrmConfig } from './config/typeorm.config';
@@ -22,6 +23,7 @@ import { HttpModule } from '@nestjs/axios';
     DocumentModule,
     ProjectModule,
     TimelineModule,
+    NoticeModule,
     AuthenticationModule,
   ],
   controllers: [AppController],

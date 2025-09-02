@@ -6,6 +6,7 @@ import { Project } from '../modules/entities/project.entity';
 import { Hashtag } from '../modules/entities/hashtag.entity';
 import { ProjectHashtag } from '../modules/entities/projectHashtag.entity';
 import { Timeline } from '../modules/entities/timeline.entity';
+import { Notice } from '../modules/entities/notice.entity';
 
 export const typeOrmConfig: TypeOrmModuleOptions = {
   type: 'postgres',
@@ -22,6 +23,7 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
     Hashtag,
     ProjectHashtag,
     Timeline,
+    Notice,
   ],
   synchronize: false, // 자동 동기화
   logging: true, // SQL 쿼리 로깅(콘솔에서 쿼리 확인 여부 설정)
