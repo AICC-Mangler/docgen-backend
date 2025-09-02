@@ -15,6 +15,9 @@ import { ProjectHashtag } from './entities/projectHashtag.entity';
 import { TimelineController } from './controllers/timeline.controller';
 import { TimelineService } from './services/timeline.service';
 import { Timeline } from './entities/timeline.entity';
+import { NoticeController } from './controllers/notice.controller';
+import { NoticeService } from './services/notice.service';
+import { Notice } from './entities/notice.entity';
 import { HttpModule } from '@nestjs/axios';
 
 @Module({
@@ -48,3 +51,11 @@ export class ProjectModule {}
   exports: [TimelineService],
 })
 export class TimelineModule {}
+
+@Module({
+  imports: [TypeOrmModule.forFeature([Notice])],
+  controllers: [NoticeController],
+  providers: [NoticeService],
+  exports: [NoticeService],
+})
+export class NoticeModule {}
