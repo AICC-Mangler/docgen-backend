@@ -2,6 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { AxiosRequestConfig } from 'axios';
 import { config } from 'dotenv';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 export async function safeRequest<T>(
   httpService: HttpService,
@@ -22,7 +23,10 @@ export async function safeRequest<T>(
     } else {
       console.error('Unknown error:', err);
     }
-    throw ''; // 필요 시 커스텀 에러로 변환
+    throw new HttpException(
+      `외부 API 호출 실패: ${err.message}`,
+      HttpStatus.BAD_GATEWAY,
+    );
   }
 }
 
@@ -32,10 +36,18 @@ export async function requestFastApi<T>(
   url: string,
   config?: AxiosRequestConfig,
 ): Promise<T> {
-  return safeRequest(
-    httpService,
-    method,
-    `${process.env.FASTAPI_URL}${url}`,
-    config,
+    try {
+      return await safeRequest(
+        httpService,
+        method,
+        `${process.env.FASTAPI_URL}${url}`,
+        config,
   );
+    } catch (error) {
+      throw new HttpException(
+        `외부 API 호출 실패: ${error.message}`,
+        HttpStatus.BAD_GATEWAY,
+      );
+    }
 }
+

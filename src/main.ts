@@ -69,6 +69,14 @@ async function bootstrap() {
     customSiteTitle: 'DocGen API Documentation',
   });
 
+  process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection:', reason);
+  });
+  
+  process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
+  });
+
   await app.listen(process.env.APP_PORT ?? 3100);
 }
 bootstrap();
