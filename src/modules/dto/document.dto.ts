@@ -162,3 +162,159 @@ export class RequirementQuestionsResponseDto{
   @Expose()
   message: string;
 }
+
+
+
+export class FunctionalDetailDto {
+  @IsString()
+  @Expose()
+  name: string;
+
+  @IsString()
+  @Expose()
+  description: string;
+}
+
+export class FunctionalDto {
+  @IsString()
+  @Expose()
+  name: string;
+
+  @IsString()
+  @Expose()
+  description: string;
+
+  @ValidateNested({ each: true })
+  @Type(() => FunctionalDetailDto) // ✅ 중첩 DTO 지정
+  @Expose()
+  details: FunctionalDetailDto[];
+}
+
+export class FunctionalMetadataDto {
+  @IsString()
+  @Expose()
+  requirement_summary: string;
+}
+
+export class FunctionalDocumentDto {
+  @Expose()
+  name: string;
+
+  @ValidateNested()
+  @Type(() => FunctionalMetadataDto)
+  @Expose()
+  metadata: FunctionalMetadataDto;
+
+  @ValidateNested({ each: true })
+  @Type(() => FunctionalDto)
+  @Expose()
+  data: FunctionalDto[];
+}
+
+export class FunctionalDocumentResponseDto {
+  @IsString()
+  @Expose()
+  id: string;
+  @IsString()
+  @Expose()
+  owner_id: string;
+
+  @IsString()
+  @Expose()
+  project_id: string;
+
+  @IsString()
+  @Expose()
+  status: string;
+
+  @IsDate()
+  @Expose()
+  create_date: Date;
+
+  @Expose()
+  @Type(() => FunctionalDocumentDto)
+  document: FunctionalDocumentDto;
+}
+
+
+export class PolicyDetailDto {
+  @IsString()
+  @Expose()
+  role: string;
+  @IsString()
+  @Expose()
+  create: string;
+  @IsString()
+  @Expose()
+  read: string;
+  @IsString()
+  @Expose()
+  update: string;
+  @IsString()
+  @Expose()
+  delete: string;
+  @IsString()
+  @Expose()
+  description: string;
+}
+
+export class PolicyDto {
+  @IsString()
+  @Expose()
+  name: string;
+
+  @IsString()
+  @Expose()
+  description: string;
+
+  @ValidateNested({ each: true })
+  @Type(() => PolicyDetailDto) // ✅ 중첩 DTO 지정
+  @Expose()
+  roles: PolicyDetailDto[];
+}
+
+export class PolicyMetadataDto {
+  @IsString()
+  @Expose()
+  requirement_summary: string;
+}
+
+export class PolicyDocumentDto {
+  @Expose()
+  name: string;
+
+  @ValidateNested()
+  @Type(() => PolicyMetadataDto)
+  @Expose()
+  metadata: PolicyMetadataDto;
+
+  @ValidateNested({ each: true })
+  @Type(() => PolicyDto)
+  @Expose()
+  data: PolicyDto[];
+}
+
+export class PolicyDocumentResponseDto {
+  @IsString()
+  @Expose()
+  id: string;
+  @IsString()
+  @Expose()
+  owner_id: string;
+
+  @IsString()
+  @Expose()
+  project_id: string;
+
+  @IsString()
+  @Expose()
+  status: string;
+
+  @IsDate()
+  @Expose()
+  create_date: Date;
+
+  @Expose()
+  @Type(() => PolicyDocumentDto)
+  document: PolicyDocumentDto;
+}

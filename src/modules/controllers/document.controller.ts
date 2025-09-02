@@ -166,7 +166,7 @@ export class DocumentController {
   }
 
   @Get('requirement/file/:document_id')
-  async getExcel(
+  async getRequirementExcel(
     @Param('document_id') document_id: string,
     @Res() response: Response,
   ) {
@@ -183,6 +183,147 @@ export class DocumentController {
       );
     }
   }
+
+  @Delete('functional/:document_id')
+  async deleteFunctionalDocument(
+    @Param('document_id') document_id: string,
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      await this.documentService.delete_functional_document(document_id);
+      return {
+        success: true,
+        message: '삭제 완료',
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          success: false,
+          message: `문서 삭제 실패: ${error.message}`,
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+
+  @Post('functional')
+  async createFunctionalDocument(
+    @Body() body:{project_id:string, owner_id: string}
+  ){
+    try {
+
+      const response = this.documentService.create_functional_document({
+        project_id:body.project_id,
+        owner_id:body.owner_id
+      })
+
+      return {
+        success:"true",
+        data:response,
+        message:""
+      }
+    } catch (error) {
+      throw new HttpException(
+        {
+          success: false,
+          message: `문서 로드 실패: ${error.message}`,
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get('functional/file/:document_id')
+  async getFunctionalExcel(
+    @Param('document_id') document_id: string,
+    @Res() response: Response,
+  ) {
+    try {
+      this.documentService.generate_functional_excel(document_id, response);
+    } catch (error) {
+      throw new HttpException(
+        {
+          success: false,
+          message: `엑셀 생성 실패: ${error.message}`,
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Delete('policy/:document_id')
+  async deletePolicyDocument(
+    @Param('document_id') document_id: string,
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      await this.documentService.delete_policy_document(document_id);
+      return {
+        success: true,
+        message: '삭제 완료',
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          success: false,
+          message: `문서 삭제 실패: ${error.message}`,
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+
+  @Post('policy')
+  async createPolicyDocument(
+    @Body() body:{project_id:string, owner_id: string}
+  ){
+    try {
+
+      const response = this.documentService.create_policy_document({
+        project_id:body.project_id,
+        owner_id:body.owner_id
+      })
+
+      return {
+        success:"true",
+        data:response,
+        message:""
+      }
+    } catch (error) {
+      throw new HttpException(
+        {
+          success: false,
+          message: `문서 로드 실패: ${error.message}`,
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Get('policy/file/:document_id')
+  async getPolicyExcel(
+    @Param('document_id') document_id: string,
+    @Res() response: Response,
+  ) {
+    try {
+      this.documentService.generate_policy_excel(document_id, response);
+    } catch (error) {
+      throw new HttpException(
+        {
+          success: false,
+          message: `엑셀 생성 실패: ${error.message}`,
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
 
   @Get('project/:project_id')
   async getDocumentList(
