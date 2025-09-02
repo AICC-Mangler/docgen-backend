@@ -6,8 +6,11 @@ import {
   Delete,
   Param,
   Body,
+  Query,
   HttpException,
   HttpStatus,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ProjectService } from '../services/project.service';
 import {
@@ -21,20 +24,22 @@ import {
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
-  @Get()
-  async getAllProjects(): Promise<ProjectListResponseDto> {
+  @Get(':id')
+  async getProjectByProjectId(
+    @Param('id') projectId: number,
+  ): Promise<ProjectSingleResponseDto> {
     try {
-      console.log('=== 프로젝트 전체 조회 요청 ===');
-      const projects = await this.projectService.findAllForResponse();
-
+      const project = await this.projectService.findByIdWithHashtags(projectId);
       return {
         success: true,
-        data: projects,
-        message: '프로젝트 목록',
-        total: projects.length,
+        data: this.projectService.toResponseDto(project),
+        message: `프로젝트 ID ${projectId}의 프로젝트를 성공적으로 조회했습니다.`,
       };
     } catch (error) {
-      console.error('컨트롤러 오류:', error);
+      console.error('컨트롤러 오류', error);
+      if (error instanceof HttpException) {
+        throw error;
+      }
       throw new HttpException(
         {
           success: false,
@@ -46,26 +51,31 @@ export class ProjectController {
     }
   }
 
-  @Get(':id')
+  @Get('')
   async getProjectById(
-    @Param('id') id: string,
-  ): Promise<ProjectSingleResponseDto> {
+    @Query('id') memberId: number,
+  ): Promise<ProjectListResponseDto> {
     try {
-      const projectId = parseInt(id, 10);
-      if (isNaN(projectId)) {
+      if (isNaN(memberId)) {
         throw new HttpException(
-          '유효하지 않은 프로젝트 ID입니다.',
+          '유효하지 않은 멤버 ID입니다.',
           HttpStatus.BAD_REQUEST,
         );
       }
 
-      console.log(`=== 프로젝트 ID ${projectId} 조회 요청 ===`);
-      const project = await this.projectService.findByIdForResponse(projectId);
+      console.log(`=== 멤버 ID ${memberId} 조회 요청 ===`);
+      const projects =
+        await this.projectService.findProjectsWithHashtagsByMemberIdRaw(
+          memberId,
+        );
 
       return {
         success: true,
-        data: project,
-        message: `ID ${projectId}인 프로젝트를 성공적으로 조회했습니다.`,
+        data: projects.map((project) =>
+          this.projectService.toResponseDto(project),
+        ),
+        message: `멤버 ID ${memberId}의 프로젝트 리스트를 성공적으로 조회했습니다.`,
+        total: projects.length,
       };
     } catch (error) {
       console.error('컨트롤러 오류:', error);
@@ -84,21 +94,21 @@ export class ProjectController {
   }
 
   @Post()
+  @UsePipes(new ValidationPipe({ transform: true }))
   async createProject(
     @Body() createProjectDto: CreateProjectDto,
   ): Promise<ProjectSingleResponseDto> {
     try {
       console.log('=== 새 프로젝트 생성 요청 ===');
       console.log('입력 데이터:', createProjectDto);
-
-      const newProject = await this.projectService.create(createProjectDto);
-      const responseProject = await this.projectService.findByIdForResponse(
-        newProject.id,
-      );
+      const newProject =
+        await this.projectService.createProjectRaw(createProjectDto);
+      const responseProject =
+        await this.projectService.findProjectByIdWithHashtagsRaw(newProject.id);
 
       return {
         success: true,
-        data: responseProject,
+        data: this.projectService.toResponseDto(responseProject),
         message: '새 프로젝트가 성공적으로 생성되었습니다.',
       };
     } catch (error) {
@@ -115,6 +125,7 @@ export class ProjectController {
   }
 
   @Put(':id')
+  @UsePipes(new ValidationPipe({ transform: true }))
   async updateProject(
     @Param('id') id: string,
     @Body() updateProjectDto: UpdateProjectDto,
@@ -133,13 +144,14 @@ export class ProjectController {
         projectId,
         updateProjectDto,
       );
-      const responseProject = await this.projectService.findByIdForResponse(
-        updatedProject.id,
-      );
+      const responseProject =
+        await this.projectService.findByIdWithTimelinesAndHashtags(
+          updatedProject.id,
+        );
 
       return {
         success: true,
-        data: responseProject,
+        data: this.projectService.toResponseDto(responseProject),
         message: `ID ${projectId}인 프로젝트가 성공적으로 수정되었습니다.`,
       };
     } catch (error) {
