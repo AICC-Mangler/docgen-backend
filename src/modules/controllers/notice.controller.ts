@@ -63,20 +63,29 @@ export class NoticeController {
   @Get('')
   @ApiOperation({
     summary: '공지사항 목록 조회',
-    description: '공지사항 목록을 조회합니다.',
+    description: '공지사항 목록을 페이지네이션과 함께 조회합니다.',
   })
   @ApiResponse({ status: 200, description: '공지 사항 목록 조회 성공' })
   @ApiResponse({ status: 400, description: '잘못된 요청 데이터' })
   @ApiResponse({ status: 404, description: '찾을 수 없음' })
   @ApiResponse({ status: 500, description: '서버 오류' })
-  async findAll(): Promise<any> {
+  async findAll(
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '10',
+  ): Promise<any> {
     try {
-      const notices = await this.noticeService.findAll();
+      const pageNum = parseInt(page, 10) || 1;
+      const limitNum = parseInt(limit, 10) || 10;
+
+      const result = await this.noticeService.findAll(pageNum, limitNum);
       return {
         success: true,
-        data: notices,
+        data: result.notices,
         message: '공지사항 조회 성공',
-        total: notices.length,
+        total: result.total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(result.total / limitNum),
       };
     } catch (error) {
       console.error('공지사항 조회 실패', error);
