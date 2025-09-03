@@ -173,7 +173,16 @@ export class DocumentService {
     );
     return response;
   }
-
+  async find_documents_user_id(
+    user_id : string,
+  ){
+    const response = await requestFastApi(
+      this.httpService,
+      'get',
+      `/api/users/${user_id}`,
+    );
+    return response;
+  }
 
   async create_functional_document(
     request_data,
