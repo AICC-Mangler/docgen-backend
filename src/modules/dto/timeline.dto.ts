@@ -35,7 +35,7 @@ export class UpdateTimelineDto {
   @IsOptional()
   @IsString()
   @MinLength(1, { message: '제목은 최소 1자 이상이어야 합니다.' })
-  @MaxLength(25, { message: '제목은 최대 25자까지 가능합니다.' })
+  @MaxLength(50, { message: '제목은 최대 25자까지 가능합니다.' })
   title?: string;
 
   @IsOptional()
