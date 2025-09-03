@@ -22,7 +22,7 @@ import {
 } from '../dto/document.dto';
 import type { Response } from 'express';
 
-@Controller('api/document')
+@Controller('document')
 export class DocumentController {
   constructor(private readonly documentService: DocumentService) {}
 
