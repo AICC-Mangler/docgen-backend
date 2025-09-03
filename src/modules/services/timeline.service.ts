@@ -21,7 +21,7 @@ export class TimelineService {
   async findAll(): Promise<Timeline[]> {
     try {
       const timelines = await this.timelineRepository.find({
-        order: { event_date: 'DESC', id: 'ASC' },
+        order: { event_date: 'ASC', id: 'ASC' },
       });
       console.log('DB 연결 성공! Timeline 테이블 조회 완료');
       console.log(`총 ${timelines.length}개의 타임라인을 찾았습니다.`);
@@ -32,25 +32,11 @@ export class TimelineService {
     }
   }
 
-  // async findProjectByMemberId(memberId: number): Promise<Project[]> {
-  //   try {
-  //     const projects = await this.projectRepository.find({
-  //       where: { member_id: memberId },
-  //     });
-  //     console.log(`멤버 ID ${memberId}의 프로젝트 조회 완료`);
-  //     console.log(`총 ${projects.length}개의 프로젝트를 찾았습니다.`);
-  //     return projects;
-  //   } catch (error) {
-  //     console.error('프로젝트별 타임라인 조회 오류:', error);
-  //     throw new Error(`프로젝트별 타임라인 조회 실패: ${error.message}`);
-  //   }
-  // }
-
   async findByProjectId(projectId: number): Promise<Timeline[]> {
     try {
       const timelines = await this.timelineRepository.find({
         where: { project_id: projectId },
-        order: { event_date: 'DESC', id: 'ASC' },
+        order: { event_date: 'ASC', id: 'ASC' },
       });
       console.log(`프로젝트 ID ${projectId}의 타임라인 조회 완료`);
       console.log(`총 ${timelines.length}개의 타임라인을 찾았습니다.`);
