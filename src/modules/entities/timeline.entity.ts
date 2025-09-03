@@ -18,7 +18,7 @@ export class Timeline {
   @Column({ name: 'project_id', type: 'bigint' })
   project_id: number;
 
-  @Column({ length: 25 })
+  @Column({ length: 50 })
   title: string;
 
   @Column({ length: 100 })
