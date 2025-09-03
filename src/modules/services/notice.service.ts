@@ -17,22 +17,43 @@ export class NoticeService {
     private dataSource: DataSource,
   ) {}
 
-  // 공지사항 전체 조회
-  async findAll(): Promise<any[]> {
-    const query = `
-    SELECT
-      id, member_id, title, content, noticetype, 
-      TO_CHAR(post_date, 'YYYY-MM-DD') as post_date,
-      created_date_time, updated_date_time
-    FROM
-    notice n
-    WHERE n.deleted_date_time IS NULL
-    ORDER BY n.post_date DESC, n.id ASC;
+  // 공지사항 전체 조회 (페이지네이션)
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ notices: any[]; total: number }> {
+    const offset = (page - 1) * limit;
+
+    // 전체 개수 조회
+    const countQuery = `
+      SELECT COUNT(*) as total
+      FROM notice n
+      WHERE n.deleted_date_time IS NULL
     `;
+
+    // 페이지네이션된 데이터 조회
+    const dataQuery = `
+      SELECT
+        id, member_id, title, content, noticetype, 
+        TO_CHAR(post_date, 'YYYY-MM-DD') as post_date,
+        created_date_time, updated_date_time
+      FROM notice n
+      WHERE n.deleted_date_time IS NULL
+      ORDER BY n.post_date DESC, n.id ASC
+      LIMIT $1 OFFSET $2
+    `;
+
     try {
-      const notices = await this.dataSource.query(query);
+      const [countResult, notices] = await Promise.all([
+        this.dataSource.query(countQuery),
+        this.dataSource.query(dataQuery, [limit, offset]),
+      ]);
+
+      const total = parseInt(countResult[0].total, 10);
       console.log('조회된 공지사항 데이터:', notices);
-      return notices;
+      console.log('전체 개수:', total);
+
+      return { notices, total };
     } catch (error) {
       console.error('공지사항 조회 실패 : ', error);
       throw new Error('공지사항 조회 실패 :' + error.message);

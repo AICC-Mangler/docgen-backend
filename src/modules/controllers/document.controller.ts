@@ -347,4 +347,27 @@ export class DocumentController {
       );
     }
   }
+
+  @Get('users/:user_id')
+  async getDocumentListInUser(
+    @Param('user_id') user_id: string,
+  ){
+    try {
+      const documents = await this.documentService.find_documents_user_id(user_id);
+      return {
+        success: true,
+        data : documents,
+        message: '로드 완료',
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          success: false,
+          message: `문서 로드 실패: ${error.message}`,
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }

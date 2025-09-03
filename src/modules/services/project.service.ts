@@ -55,6 +55,17 @@ export class ProjectService {
     return result;
   }
 
+  async findByMemberIdTotal(memberId: number): Promise<any[]> {
+    const query = `
+    SELECT
+       count(*) as id
+      FROM project p
+      WHERE p.member_id = $1 AND p.deleted_date_time IS NULL
+    `;
+    const result = await this.dataSource.query(query, [memberId]);
+    return result[0];
+  }
+
   // Raw SQL을 사용한 단일 프로젝트 조회 (해시태그 포함)
   async findProjectByIdWithHashtagsRaw(projectId: number): Promise<any> {
     const query = `

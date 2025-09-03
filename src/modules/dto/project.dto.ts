@@ -56,7 +56,6 @@ export class UpdateProjectDto {
   @IsString({ each: true })
   hashtags?: string[];
 }
-
 export class ProjectResponseDto {
   id: number;
   member_id: number;

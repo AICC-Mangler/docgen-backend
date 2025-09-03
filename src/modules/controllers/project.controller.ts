@@ -24,6 +24,31 @@ import {
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
+  @Get('total/:id')
+  async getProjectTotalByMemberId(@Param('id') memberId: number): Promise<any> {
+    try {
+      const result = await this.projectService.findByMemberIdTotal(memberId);
+      return {
+        success: true,
+        data: result,
+        message: `멤버 ${memberId} 의 총 프로젝트 개수를 조회`,
+      };
+    } catch (error) {
+      console.error('컨트롤러 오류', error);
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        {
+          success: false,
+          message: `프로젝트 개수 조회 실패: ${error.message}`,
+          error: error.message,
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   @Get(':id')
   async getProjectByProjectId(
     @Param('id') projectId: number,
