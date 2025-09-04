@@ -24,7 +24,7 @@ import {
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
-  @Get('total/:id')
+  @Get('count/:id')
   async getProjectTotalByMemberId(@Param('id') memberId: number): Promise<any> {
     try {
       const result = await this.projectService.findByMemberIdTotal(memberId);
@@ -152,11 +152,11 @@ export class ProjectController {
   @Put(':id')
   @UsePipes(new ValidationPipe({ transform: true }))
   async updateProject(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() updateProjectDto: UpdateProjectDto,
   ): Promise<ProjectSingleResponseDto> {
     try {
-      const projectId = parseInt(id, 10);
+      const projectId = id;
       if (isNaN(projectId)) {
         throw new HttpException(
           '유효하지 않은 프로젝트 ID입니다.',
