@@ -73,53 +73,6 @@ export class DocumentController {
     }
   }
 
-  @Get('requirement/user/:user_id')
-  async getRequirementDocumentListUseUser(
-    @Param('user_id') user_id: string,
-  ): Promise<RequirementDocumentListResponseDto> {
-    try {
-      const document = await this.documentService.find_requirement_document_user(user_id);
-      return {
-        success: true,
-        data: document,
-        message: '문서 검색 성공',
-        total: document.length
-      };
-    } catch (error) {
-      throw new HttpException(
-        {
-          success: false,
-          message: `문서 검색 실패: ${error.message}`,
-          error: error.message,
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-  @Get('requirement/project/:project_id')
-  async getRequirementDocumentListUseProject(
-    @Param('project_id') project_id: string,
-  ): Promise<RequirementDocumentListResponseDto> {
-    try {
-      const document = await this.documentService.find_requirement_document_project_id(project_id);
-      return {
-        success: true,
-        data: document,
-        message: '문서 검색 성공',
-        total: document.length
-      };
-    } catch (error) {
-      throw new HttpException(
-        {
-          success: false,
-          message: `문서 검색 실패: ${error.message}`,
-          error: error.message,
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
   @Get('requirement/:document_id')
   async getRequirementDocument(
     @Param('document_id') document_id: string,
