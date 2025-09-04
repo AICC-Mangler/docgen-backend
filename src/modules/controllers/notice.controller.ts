@@ -29,8 +29,8 @@ export class NoticeController {
   @Get(':noticeId')
   @ApiParam({ name: 'noticeId', description: '공지사항 ID' })
   @ApiOperation({
-    summary: '공지사항 목록 조회',
-    description: '공지사항 목록을 조회합니다.',
+    summary: '공지사항 상세 조회',
+    description: '특정 공지사항을 상세조회합니다.',
   })
   @ApiResponse({ status: 200, description: '공지 사항 목록 조회 성공' })
   @ApiResponse({ status: 400, description: '잘못된 요청 데이터' })
